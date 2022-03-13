@@ -1,0 +1,533 @@
+@charset "UTF-8";
+
+/*共通部分---------------*/
+html {
+    font-size: 100%;
+}
+body {
+    font-family: "Noto Sans JP", "Hiragino kaku Gothic ProN", sans-serif;
+    line-height: 1.7;
+    color: #121212;
+    overflow-x: hidden; //レスポンシブで通常は左側から飛び出す横のスクロールバーをかくしておくため//
+    min-width:320px;
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+* {
+    font-weight: bold;
+}
+
+
+// * {outline: 1px solid red;}             //枠線を調べるとき
+$btnWidth: 23px;                          //三本線の長さと太さを変数指定//
+$btnHeight: 2px;
+$background-color:#2498b3;
+
+
+//PC版//
+    //*--header全体--*//
+    .page-header {
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        background-color: #fff;
+        position: fixed;           //これを入れないとアコーディオンメニューが背景の下になってしまう//
+        z-index: 40;               /*---背景よりヘッダーを上に浮かせるため重なりの順位を上げる-three featuresより上にあげるので20＜30に*/
+        @media screen and (max-width: 1200px) {
+            height:50px;
+        }
+    }
+
+    /*--header 左側--*/
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    h1 {
+        width: 157.28px;
+        height: 33px;
+        margin-left: 20px;
+        margin-bottom: 15px;
+        @media screen and (max-width: 1200px) {
+            margin:10px;
+            width :142.98px;
+            height:30px;
+        } 
+        img {
+            margin-bottom:12px;
+        }
+       }
+
+    .header-left p {
+        font-size: 14px;
+        font-weight: 900;
+        margin-left: 16px;
+        line-height: 1.3;
+        @media screen and (max-width: 1280px) {
+            display: none;
+        }
+    }
+
+    .header-left strong {
+        font-size: 18px;
+        font-weight: 800;
+     }
+
+
+   button{
+       &.p-hamburger{                              //buttonの中（下）ではなくbuttonと並列したクラスなので＆がいる
+       display:none;
+       }
+       @media screen and (max-width: 1200px) {     //1200以下で表示させる三本線をここから記載
+
+            &.p-hamburger {
+                display         : block;
+                width           : 50px;
+                height          : 50px;
+                background-color: #fff;
+                position        : relative;        //三本線をアニメーションで動かしたいのでこれを親要素としてrelativeの設定が必要//
+                cursor          : pointer;
+
+                &::before,
+                &::after {
+                    content          : "";                   //中身空の疑似要素用//
+                    width            : $btnWidth;
+                    height           : $btnHeight;
+                    background-color : $background-color;
+                    position         : absolute;            //上下2本の線を真ん中の線の親を基準に配置するため//
+                    left             : calc(50% - (#{$btnWidth} / 2)); //これで線が枠のちょうど真ん中にくる//
+                    display          : block;                //疑似要素を表示させるため//
+                    transition       : transform 0.2s;    //アニメーションのときの作動//
+                }
+                &::before {
+                    top: 15px;
+                }
+                &::after {
+                    bottom: 15px;
+                }
+                > span {                          //真ん中の線の設定//
+                    width            : $btnWidth;
+                    height           : $btnHeight;
+                    font-size        : 0;                 //これで文字が表示されなくなる//
+                    background-color : $background-color;
+                    background-size  : auto $btnHeight;    //ここ質問
+                    position         : absolute;
+                    left             : calc(50% - (#{$btnWidth} / 2));
+                    top              : calc(50% - 1px );                //上から
+                    transition       : transform 0.2s;
+                    }
+              } //&.p-hamburgerの閉じタグ
+
+
+                &.is-open {
+                    background-color: $background-color;
+
+                    &::before {
+                        transform: rotate(45deg);
+                        top: 25px;                      //中心が上から25px//
+                        background-color: #fff;
+                    }
+                    &::after {
+                        transform: rotate(-45deg);
+                        top: 25px;
+                        background-color: #fff;
+                    }
+                    > span {
+                        background: none;
+                    }
+                }
+            }
+
+            body.is-open {         //メニュー自体はスクロールさせるけど下の本体はスクロールさせないため//
+                position: fixed;
+
+            }
+         }
+
+    //    }  //media screen 1200の閉じタグ
+    // }   //buttonの閉じタグ
+
+
+    .accordion-content {
+        display: flex;
+        justify-content: flex-end;
+        list-style: none;
+        align-items: center;
+        background-color: #fff;
+
+        @media screen and (max-width: 1200px) {       //1200以下のメニュー表示を縦にする設定
+            display:none;
+            &.open {
+              display:flex;
+              flex-direction: column;
+              position:absolute;
+              top:50px;
+              justify-content:none;
+              width:100%;
+              left:0;
+              align-items:inherit;
+              text-align: left;
+              transition : transform 0.2s;
+
+                li:nth-child(3) .accordion-menu::before,
+                li:nth-child(3) .accordion-menu::after {
+                  content:none;
+                }
+          } //open の閉じタグ
+        }  //media screen 1200の閉じタグ
+       } //accordion-content の閉じタグ
+
+     /*--header ナビメニュー詳細--*/
+    .accordion-menu {
+        padding: 15px 15px;
+        color: #121212;
+        font-size: 16px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        list-style: none;
+        position: relative;
+           &:hover {
+            background-color: #d4f1f8;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 1260px) {
+            padding: 10px 10px;
+         }
+        @media screen and (max-width: 1200px) {   //1200以下のときはハンバーガーボタンをクリックすると開く
+            height: 47px;
+
+             //1200以下のときに右にプラスマイナスを表示させる設定
+                 &::before,
+                 &::after {
+                    content          : "";                   //中身空の疑似要素用//
+                    width            : $btnWidth;
+                    height           : $btnHeight;
+                    background-color : #121212;
+                    position         : absolute;            //上下2本の線を真ん中の線の親を基準に配置するため//
+                    right            : 13.5px;
+                    top              : calc(50% + 1px);
+                    display          : block;                //疑似要素を表示させるため//
+                    z-index:20;
+                 }
+                &::after {
+                    transform  : translateY(-50%) rotate(90deg);
+                    transition : 2ms;
+                    top        : calc(50% + 2px);
+                }
+
+                &.open {
+                    &:hover {
+                        background-color:  #F3FAFB;
+                     }
+                      &::after{                           //マイナス部分の薄グレー背景の設定 縦棒を背景に変える
+                          transform  : translateY(-50%);
+                          transition : 5ms;
+                          top        : 23.5px;
+                          right      : 0px;
+                          width      : 50px;
+                          height     : 47px;
+                          background-color: #F7F7F7;
+                          z-index    :10;
+                      }
+              }  //openの閉じタグ
+        }  //media screenの閉じかっこ
+      }  //accordion-menuの閉じかっこ
+
+    /*--クリックしたら出てくるアコーディオンメニューの設定--*/
+    .accordion-nav {
+        display         : none;
+        flex-direction  : column;
+        background-color: #e9f8fb;
+        list-style      : none;
+        text-align      : left;
+        cursor          : pointer;
+        position        : absolute;
+        font-weight     : 300;
+
+        & li {
+            padding-left : 15px;
+            padding-right: 60px;
+            line-height  : 58px;
+
+            &:hover {
+                background-color: #fff;
+                color           : #2498b3;
+                display         : block;
+            }
+        }
+        @media screen and (max-width: 1200px) {
+            width           : 100%;
+            position        : inherit;   //PCのときはabsolute
+            background-color: #fff ;
+            color           : #131d34;
+
+            & li {
+                padding-left :40px;
+
+            &:hover {
+                color           : #131d34;
+                display         : block;
+                background-color: #F3FAFB;
+            }
+          }
+        }
+    }
+
+    .accordion-nav li a {
+        color      : inherit;
+        font-weight: 100;
+    }
+
+    /*--受講お申し込み--*/
+    .header-nav li a.application {
+        display         : block;
+        height          : 70px;
+        color           : #fff;
+        background-color: #2498b3;
+        padding         : 20px 15px;
+        @media screen and(max-width:1260px){
+            padding     :20px 10px;
+            
+        }
+        @media screen and (max-width: 1200px) {    //1200以下のときはクリックする前は隠れている状態
+            display:none;
+        }
+    }
+
+    /*--main--*/
+    /*--背景画像--*/
+    .background-img {
+        position: relative;
+        height: 800px;
+        max-width: 100%;
+        overflow: hidden;
+        @media screen and (max-width: 1200px) {
+            top:-20px;
+         }
+         @media screen and (max-width: 767px) {
+            height:320px;
+            top:50px;
+         }
+     }
+
+    .scrolled-background {
+        /*--スクロールする背景の設定--*/
+        background-image: url(../images/bg-hero1.png), url(../images/bg-hero2.png);
+        background-position: center -5px;
+        background-repeat: no-repeat;
+        background-attachment: local;
+        position: absolute;
+        width : 100vw;
+        height: 800px;
+        margin-right:0px;
+        @media screen and (max-width: 767px) {
+            background-size: auto 40%;
+            background-position: center -30px;
+        }
+      }
+
+    .fixed-background {
+        /*--固定する背景の設定--*/
+        background-image: url(../images/bg-hero3.png);
+        background-size: cover; /*--画面に合わせて表示--*/
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position:center -5px;
+        position: absolute;
+        z-index: -1;
+        width: 100vw;
+        height: 800px;
+        margin-right:0px;
+        @media screen and (max-width: 767px) {
+            background-size : auto 80%;
+            background-position:center -10px;
+        }
+     }
+
+    //メイン部分//
+    main {
+        display: flex;
+        justify-content: center;
+        background-size: cover;
+    }
+
+    //センターの白いイントロ部分//
+    article {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 43px 19px 40px 19px;
+        color: #121212;
+        width: 413px;
+        height: 328px;
+        text-align: center;
+        position: absolute;
+        top: 150px;
+        left:calc(50% - 206.5px);
+        font-weight: bold;
+
+        @media screen and (max-width: 1200px) {
+            top: 130px;
+         }
+        @media screen and (max-width: 767px) {
+            width:100%;
+            top: 215px;
+            left:0;
+            border-radius: 0;
+            padding:9px 0px 13px;
+            }
+
+        h2 a img {
+            width: 280px;
+            height: auto;
+            @media screen and (max-width: 767px) {
+                display:none;
+            }
+        }
+
+        p {
+            margin: 12px 10px 8px;
+            @media screen and (max-width: 767px) {
+                font-size:13px;
+                margin:6px 0px;
+             }
+             @media screen and(max-width:287px){
+                 width:100%;
+
+             }
+        }
+
+        //マンガでわかるRaiseTechのボタン//
+        & .button {
+            color: #fff;
+            background-color: #2498b3;
+            border-radius: 3px;
+            padding: 20px 37px;
+            margin-top: 20px;
+            font-size: 1.15rem;
+            bottom: 40px;
+            font-weight: 590;
+            display: inline-block;
+            transition:all 500ms 0s ease-in;            
+
+            @media screen and (max-width: 767px) {
+                font-size:1rem;
+                padding:8px 18px 6px;
+                margin-top:8px;                 
+            }
+
+        } //buttonの閉じタグ
+      } //articleの閉じタグ
+    // } //main-informationの閉じタグ
+
+    //下の黒い部分のテキスト部分//
+    .three-features {         //背景黒部分
+        width : 100%;
+        height: 230px;
+        background-color: #000000;
+        position:relative;
+        top:-80px;
+
+            @media screen and(max-width:1200px){
+                 top:-100px;
+             }
+             @media screen and(max-width:767px){
+                 top    : 50px;
+                 height :100%;
+                 margin :0 auto;
+                 padding: 40px 20px;
+             }        
+    }
+
+    .comment-wrap {    //アイテムのくくり
+        display:flex;
+        justify-content: center;
+        width:100%;
+        margin-top:-210px;
+              @media screen and(max-width:767px){
+                  flex-direction: column;
+                  margin-top:inherit;
+              }
+
+        .comment-container {
+            width: auto;
+            margin:0px 40px;
+            color: #fff;
+            display: block;
+            justify-content: center;
+
+           @media screen and(max-width:1078px) {
+               width:29.33%;
+               margin:0 2%;
+           }
+
+            @media screen and (max-width: 767px) {
+                width:100%;
+                justify-content: center;
+                margin:15px auto;
+                width:auto;
+                top:70px;
+            }         
+
+            .round-contents {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width : 230px;
+                height: 230px;
+                margin: 10px auto 5px;
+                border-radius: 50%;
+                background-color: #fff;
+                border: solid 6px #000;
+                color: #000;
+                .icon-content {
+                    width: 100px;
+                    height: 100px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+              }
+
+            h3 {
+                font-size: 1.5rem;
+                margin-top: 5px;
+                text-align: center;
+                  @media screen and (max-width: 1078px) {
+                     margin:8px 0px 0px;
+                   }
+                   @media screen and(max-width:767px){
+                     width:100%;
+
+                   }
+                }
+
+            p {
+                text-align: left;
+                align-items: center;
+                margin:8px 8px;
+                width:230px;
+                @media screen and (max-width: 1078px) {
+                    margin:8px 0px 0px;
+                    width:100%;
+                 }
+
+                @media screen and (max-width: 767px) {
+                    margin:8px 0px 0px;
+
+                }
+             }
+
+        } //comment-containerの閉じタグ//
+     } //three-featuresの閉じタグ
